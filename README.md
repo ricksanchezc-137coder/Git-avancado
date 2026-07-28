@@ -31,3 +31,20 @@ Criação de commits "sujos" de propósito (wip, typos, testes) e limpeza via fi
 - Rebase reaplica commits como patches; reordenar ou editar um commit no meio pode gerar conflito mesmo sem incompatibilidade real de conteúdo, porque o contexto do patch mudou
 - Qualquer alteração num commit muda seu hash e, em cascata, o hash de todos os commits seguintes (efeito do parent hash)
 
+## Módulo 3: Cherry-pick (com resolução de conflitos)
+
+Praticado `git cherry-pick` para aplicar um commit específico de outra branch sem trazer todo o histórico dela.
+
+**Comandos explorados:**
+- `git cherry-pick <hash>` — aplica o diff de um commit específico como novo commit na branch atual
+- `git cherry-pick <hash1>..<hash2>` — aplica um intervalo de commits
+- `git cherry-pick -n` (`--no-commit`) — aplica as mudanças sem commitar
+- `git cherry-pick -x` — registra na mensagem de qual commit a mudança veio
+- `git cherry-pick --continue` / `--abort` / `--skip` — controle do processo em caso de conflito
+
+**Resolução de conflito:**
+Criadas duas branches (`feature-zero` e `feature-round`) que alteravam a mesma função (`divide`) de formas diferentes — uma tratando divisão por zero, outra arredondando o resultado. Ao dar cherry-pick de `feature-round` dentro de `feature-zero`, o Git parou no conflito por ambas mexerem na mesma linha. Resolvido manualmente combinando as duas mudanças, mantendo o tratamento de zero e o arredondamento juntos.
+
+Fluxo de resolução: editar o arquivo removendo os marcadores (`<<<<<<<`, `=======`, `>>>>>>>`), `git add` no arquivo resolvido, e `git cherry-pick --continue` para finalizar o commit.
+
+**Aprendizado principal:** cherry-pick traz uma mudança pontual de uma branch pra outra sem mergear tudo, mas gera conflito sempre que a mesma região de código foi alterada nos dois lados — a resolução segue o mesmo princípio de qualquer conflito de merge/rebase.
