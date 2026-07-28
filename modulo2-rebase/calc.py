@@ -12,5 +12,6 @@ def multiplica(a, b):
 def divide(a, b):
     if b == 0:
         raise ValueError("Divisao por zero")
-    return a / b
+    return round(a / b, 2)
+
 
