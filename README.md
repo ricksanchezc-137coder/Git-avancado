@@ -48,3 +48,40 @@ Criadas duas branches (`feature-zero` e `feature-round`) que alteravam a mesma f
 Fluxo de resolução: editar o arquivo removendo os marcadores (`<<<<<<<`, `=======`, `>>>>>>>`), `git add` no arquivo resolvido, e `git cherry-pick --continue` para finalizar o commit.
 
 **Aprendizado principal:** cherry-pick traz uma mudança pontual de uma branch pra outra sem mergear tudo, mas gera conflito sempre que a mesma região de código foi alterada nos dois lados — a resolução segue o mesmo princípio de qualquer conflito de merge/rebase.
+
+## Módulo 4 — Reflog
+
+### O que é
+O reflog (`git reflog`) registra localmente todo movimento das referências (HEAD, branches) — commits, checkouts, resets, rebases, amends. Diferente do `git log`, que mostra só o histórico alcançável por uma branch, o reflog mostra pra onde as referências já apontaram, incluindo commits que ficaram "soltos" (sem nenhuma branch apontando pra eles).
+
+Importante: é local e temporário (não vai no push, expira por padrão em 90 dias os commits alcançáveis e 30 dias os não-alcançáveis).
+
+### Prática 1 — reset --hard e recuperação direta
+- 4 commits sequenciais na main (`primeiro` → `quarto`)
+- `git reset --hard HEAD~3` simulou a perda dos últimos 3 commits
+- `git reflog` mostrou o histórico completo, incluindo os commits "perdidos"
+- Recuperado com `git reset --hard HEAD@{1}`, voltando ao estado exato de antes do reset
+
+### Prática 2 — recuperação via branch nova (mais seguro)
+- Repetido o `reset --hard HEAD~3`
+- Em vez de sobrescrever a main, criada uma branch nova a partir do reflog: `git branch recuperada HEAD@{1}`
+- `main` continuou no estado "quebrado", enquanto `recuperada` tinha o histórico completo — permite decidir depois o que fazer, sem mexer no estado atual
+
+### Prática 3 — branch deletada
+- Criada `branch-teste`, com um commit
+- Deletada com `git branch -D branch-teste`
+- O próprio Git mostrou o hash do commit no aviso de deleção (`Deleted branch branch-teste (was <hash>)`) — atalho mais direto que vasculhar o reflog inteiro
+- Branch recriada com `git branch branch-teste <hash>`, commit recuperado intacto
+
+### Comandos-chave
+
+git reflog
+
+git reflog show <branch>
+
+git reset –hard HEAD@{n}
+
+git branch <nome> HEAD@{n}
+
+git branch <nome> <hash>
+
