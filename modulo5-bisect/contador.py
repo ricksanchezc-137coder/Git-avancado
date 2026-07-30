@@ -13,3 +13,5 @@ def divisao(a, b):
 def potencia(base, expoente):
     return base ** expoente
 
+def media(a, b):
+    return (a + b ) / 2
