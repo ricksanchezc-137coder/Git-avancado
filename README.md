@@ -85,3 +85,36 @@ git branch <nome> HEAD@{n}
 
 git branch <nome> <hash>
 
+## Módulo 5: Bisect (debugging via histórico)
+
+Praticado dentro da subpasta `modulo5-bisect`, com um projeto de teste (`contador.py`)
+contendo funções simples (soma, subtração, multiplicação, divisão, potência, média).
+
+Um bug foi introduzido de propósito em um commit no meio do histórico, disfarçado
+de refatoração ("refatora funcao soma para maior clareza"), trocando `a + b` por
+`a - b`. Mais commits inocentes foram feitos depois, simulando um bug que passou
+despercebido por um tempo.
+
+Criado um teste simples (`assert soma(2, 3) == 5`) pra detectar o problema.
+
+**Busca manual:**
+git bisect start
+
+git bisect bad HEAD
+
+git bisect good <primeiro commit>
+
+A cada passo, o Git faz checkout automático de um commit no meio do intervalo
+restante (detached HEAD). Rodando o teste e marcando `git bisect good` ou
+`git bisect bad`, o commit culpado foi encontrado em 3 passos (busca binária)
+em vez de checar os 8 commits um por um.
+
+**Busca automatizada** com `git bisect run <comando>`: o Git roda o comando
+sozinho a cada passo, usando o código de saída do processo (0 = good, diferente
+de 0 = bad) pra decidir automaticamente. Pegadinha encontrada na prática: o script
+de teste e o `__pycache__` precisam ficar fora da influência do checkout, ou o
+Python pode ler um arquivo ausente ou bytecode desatualizado durante a troca de
+commits, contaminando o resultado.
+
+Bug corrigido depois de identificado, com commit dedicado referenciando o bisect.
+
