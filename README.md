@@ -118,3 +118,29 @@ commits, contaminando o resultado.
 
 Bug corrigido depois de identificado, com commit dedicado referenciando o bisect.
 
+#Módulo 6: Stash avançado
+
+
+
+Prática de git stash além do uso básico, cobrindo múltiplos stashes, mensagens customizadas, stash parcial (por hunk) e recuperação via branch.
+
+
+
+Cenários praticados:
+
+
+
+• Stash básico: git stash / git stash pop para guardar e recuperar mudanças temporárias.
+
+• Múltiplos stashes: acumular mais de um stash e recuperar um específico com git stash apply stash@{n}, depois limpar com git stash drop.
+
+• Stash com mensagem: git stash -m "mensagem" para identificar o conteúdo de cada stash na lista.
+
+• Stash parcial: git stash -p, usando split (s) para dividir mudanças em hunks menores e escolher (y/n) exatamente o que vai pro stash, deixando o resto no working directory.
+
+• Stash branch: git stash branch <nome> stash@{n} para recuperar um stash numa branch nova, criada a partir do commit em que ele foi originado — evita conflito quando o main avançou com mudanças incompatíveis.
+
+
+
+Aprendizado principal: o stash branch resolve o problema de “meu stash não bate mais com o main atual”, porque ele reconstrói o ponto de partida certo antes de aplicar as mudanças, ao invés de tentar encaixar o stash na ponta atual do main.
+
