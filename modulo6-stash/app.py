@@ -5,4 +5,5 @@ def multiplica(a, b):
     return a * b
 
 def media(lista):
-    return sum(lista) / len(lista)
+    print(f"calculando media com base em {lista}")
+    return round(sum(lista) / len(lista), 2)
