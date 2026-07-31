@@ -1,5 +1,5 @@
 def get_config():
     return {
         "debug" : True,
-        "timeout" : 45
+        "timeout" : 77
     }
