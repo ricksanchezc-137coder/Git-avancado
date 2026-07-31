@@ -11,7 +11,6 @@ def media(lista):
     print(f"calculando media com base em {lista}")
     return round(sum(lista) / len(lista), 2)
 
-    return sum(lista) / len(lista)
 
 def divisao(a, b):
     print(f"dividindo {a} e {b}")
