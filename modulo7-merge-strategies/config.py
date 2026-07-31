@@ -4,4 +4,5 @@ def get_config():
         "timeout" : 300,
         "retries" : 3 
         "max_connections" : 10
+        "log_level" : "INFO"
     }
