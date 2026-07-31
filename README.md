@@ -144,3 +144,44 @@ Cenários praticados:
 
 Aprendizado principal: o stash branch resolve o problema de “meu stash não bate mais com o main atual”, porque ele reconstrói o ponto de partida certo antes de aplicar as mudanças, ao invés de tentar encaixar o stash na ponta atual do main.
 
+## Módulo 7: Merge Strategies e rerere
+
+Prática de estratégias de merge do Git, resolução de conflitos com
+`-X ours`/`-X theirs`, uso do `git rerere` e teste do merge `octopus`.
+
+### O que foi praticado
+
+1. **Fast-forward vs `--no-ff`**
+- Fast-forward: merge sem commit, ponteiro só avança.
+- `--no-ff`: força merge commit mesmo quando fast-forward seria possível,
+preservando no histórico o registro de que a feature existiu como
+branch separada.
+
+2. **Resolução automática de conflito com `-X ours` / `-X theirs`**
+- `-X ours`: em conflito, mantém a versão que já estava na branch atual.
+- `-X theirs`: em conflito, mantém a versão da branch que está entrando.
+- Fast-forward ignora `-X` completamente (não há conflito pra resolver).
+
+3. **`git rerere` (Reuse Recorded Resolution)**
+- Ativado com `git config rerere.enabled true`.
+- Grava a resolução de um conflito e reaplica automaticamente se o
+mesmo conflito aparecer de novo.
+- Por padrão não dá `git add` sozinho (`rerere.autoUpdate` desligado);
+o merge segue marcado como "unmerged" até o add manual, mesmo com
+o conteúdo já resolvido.
+
+4. **Merge `octopus` (3+ branches)**
+- Mescla várias branches numa única operação, só quando não há conflito.
+- Se qualquer branch conflitar, a operação é **atômica**: desfaz tudo,
+inclusive partes que já teriam dado fast-forward — não é possível
+resolver manualmente no meio do processo.
+- Nesse teste, deu conflito e foi abortado; refeito com merges
+individuais (`feature-a`, `feature-b`, `feature-c`).
+
+### Commits principais
+- Fast-forward: `feature-debug`
+- `--no-ff`: `feature-timeout`
+- `-X ours`: `feature-timeout-90` → `feature-timeout-120`
+- `-X theirs`: `feature-timeout-77` (conflito real, direto no main)
+- rerere: `feature-rerere-teste` (conflito repetido, resolução reaplicada)
+- octopus (falhou) → merges individuais: `feature-a`, `feature-b`, `feature-c`
