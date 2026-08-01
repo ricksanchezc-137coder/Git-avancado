@@ -216,3 +216,39 @@ Hooks copiados pra `.githooks/` (versionada) e ativados com `git config core.hoo
 
 **Atenção:** `core.hooksPath` é uma config local (fica em `.git/config`, não versionado). Quem clonar o repo do zero precisa rodar `git config core.hooksPath .githooks` manualmente — os hooks não ativam sozinhos só por estarem na pasta.
 
+
+## Módulo 9 — Worktrees
+
+### Teoria
+`git worktree` permite ter múltiplos diretórios de trabalho ligados ao mesmo
+repositório, cada um numa branch diferente, ao mesmo tempo — sem precisar
+clonar o repo de novo. Cada worktree tem sua própria working directory e
+seu próprio index, mas todos compartilham o mesmo histórico de commits
+(.git). A mesma branch não pode estar checked out em dois worktrees ao
+mesmo tempo — o Git bloqueia isso pra evitar inconsistência.
+
+### Prática
+- Criado o worktree `worktree-feature` numa branch nova (`feature-worktree`)
+com `git worktree add <caminho> -b <branch>`
+- Editado o `app.py` de forma diferente em cada worktree, sem commitar;
+confirmado com `git status` que cada worktree só enxerga a própria
+mudança
+- Commitado separadamente em cada worktree (`main` e `feature-worktree`),
+confirmando com `git log --oneline` que os históricos divergem mas
+compartilham o mesmo `.git`
+- Testado o bloqueio de branch duplicada: `git checkout feature-worktree`
+a partir do repo principal falhou com
+`fatal: 'feature-worktree' is already used by worktree at '...'`
+- Removido o worktree extra com `git worktree remove` e confirmado com
+`git worktree list` que só sobrou o worktree principal
+
+### Achados
+- O worktree nasceu **dentro** de `~/git-avancado` em vez de como pasta
+irmã (erro de planejamento do caminho relativo), o que fez o `git status`
+do repo principal listar `worktree-feature/` como untracked. Confirma na
+prática por que a convenção é sempre criar worktrees fora da pasta do
+repo principal.
+- O hook `pre-commit` do módulo 8 bloqueou o commit inicial por causa de
+um `print()` proposital do exercício (falso positivo) — resolvido com
+`git commit --no-verify`. Mostra a limitação de hooks simples baseados
+em regex: são cegos ao contexto.
