@@ -252,3 +252,45 @@ repo principal.
 um `print()` proposital do exercício (falso positivo) — resolvido com
 `git commit --no-verify`. Mostra a limitação de hooks simples baseados
 em regex: são cegos ao contexto.
+
+
+##Módulo 10 — Submodules vs Subtrees
+
+
+
+Duas formas de incluir um repositório externo (Katas) dentro do git-avancado, com filosofias opostas: submodule mantém referência separada por pointer; subtree mescla o conteúdo direto no histórico.
+
+
+
+Submodule — praticado em modulo10-submodules-subtrees/katas (removido ao final):
+
+
+
+• git submodule add cria .gitmodules e uma entrada especial (modo 160000) apontando pra um commit específico do Katas
+
+• Clone normal (sem --recurse-submodules) traz a pasta vazia; precisa de git submodule update --init pra popular
+
+• Dentro do submodule, o Git deixa em HEAD detached, não numa branch
+
+• Commit novo dentro do submodule não atualiza o repo pai sozinho — precisa de commit explícito no pai atualizando o pointer
+
+• Remoção completa exige 3 passos: deinit, rm, e limpar .git/modules/
+
+• Bônus real: dois clones locais (git-avancado e um clone de teste) divergiram por causa de pushes em momentos diferentes, gerando um conflito modify/delete genuíno, resolvido via git pull --no-rebase + git rm + commit de merge
+
+
+
+Subtree — praticado em modulo10-submodules-subtrees/katas-subtree:
+
+
+
+• git subtree add --squash já traz o conteúdo completo de cara, sem init, e cria o(s) commit(s) automaticamente
+
+• git subtree pull --squash traz atualizações do repo externo, mesclando direto — passou pelo hook de commit-msg (Módulo 8) porque usa git merge por baixo, diferente do add/squash interno que usa commit-tree e não aciona hooks
+
+• git subtree push extrai mudanças feitas na subpasta e manda de volta pro repo externo como commit normal, com fast-forward limpo do outro lado
+
+
+
+Conclusão prática: subtree evita as duas maiores dores do submodule no dia a dia (init/update manual e pointer desatualizado), ao custo de reconstruir histórico compartilhado nas trocas (pull/push mais lentos) e do repo pai crescer com o conteúdo externo embutido.
+
