@@ -1,0 +1,19 @@
+#!/bin/sh
+arquivos=$(git diff --cached --name-only --diff-filter=ACM -- '*.py')
+[ -z "$arquivos" ] && exit 0
+
+encontrado=0
+for arquivo in $arquivos; do
+    if git show ":$arquivo" | grep -n "print(" > /dev/null; then
+        echo "❌ print() encontrado em: $arquivo (versão staged)"
+        git show ":$arquivo" | grep -n "print("
+        encontrado=1
+    fi
+done
+
+if [ "$encontrado" -eq 1 ]; then
+    echo ""
+    echo "Commit bloqueado: remova os print() de debug antes de commitar."
+    exit 1
+fi
+exit 0
