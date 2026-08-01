@@ -3,3 +3,4 @@ def soma(a, b):
 
 def subtrai(a, b):
     return a - b
+
