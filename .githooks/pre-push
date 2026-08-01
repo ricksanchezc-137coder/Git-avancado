@@ -1,0 +1,9 @@
+#!/bin/sh
+echo "Rodando testes antes do push..."
+python3 ~/git-avancado/modulo8-hooks/test_app.py
+if [ $? -ne 0 ]; then
+    echo "❌ Testes falharam. Push bloqueado."
+    exit 1
+fi
+echo "✅ Testes passaram."
+exit 0

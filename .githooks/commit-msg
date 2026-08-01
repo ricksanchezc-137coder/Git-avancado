@@ -1,0 +1,8 @@
+#!/bin/sh
+mensagem=$(head -n 1 "$1")
+if ! echo "$mensagem" | grep -qE "^(feat|fix|docs|refactor|test|chore): "; then
+    echo "❌ Mensagem inválida: \"$mensagem\""
+    echo "Use: feat:, fix:, docs:, refactor:, test: ou chore:"
+    exit 1
+fi
+exit 0
