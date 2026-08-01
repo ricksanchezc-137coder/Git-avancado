@@ -185,3 +185,34 @@ individuais (`feature-a`, `feature-b`, `feature-c`).
 - `-X theirs`: `feature-timeout-77` (conflito real, direto no main)
 - rerere: `feature-rerere-teste` (conflito repetido, resolução reaplicada)
 - octopus (falhou) → merges individuais: `feature-a`, `feature-b`, `feature-c`
+
+
+
+## Módulo 8 — Hooks (pre-commit, pre-push, commit-msg)
+
+### Teoria
+
+Hooks são scripts que o Git executa automaticamente em pontos do fluxo (commit, push, etc.), guardados em `.git/hooks/`. Não são versionados por padrão porque `.git/` nunca vai pro repositório — a solução é `core.hooksPath`, apontando pra uma pasta dentro do próprio projeto.
+
+Podem ser escritos em qualquer linguagem (precisam de shebang + permissão de execução). O exit code decide o resultado: `0` deixa passar, qualquer coisa diferente de `0` cancela a ação.
+
+- **pre-commit**: roda antes do commit ser criado. Usado aqui pra bloquear `print()` de debug staged.
+- **commit-msg**: roda depois da mensagem escrita, recebe o caminho do arquivo de mensagem como `$1`. Usado aqui pra exigir prefixo convencional (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`).
+- **pre-push**: roda antes do push, recebe remoto via stdin. Usado aqui pra rodar os testes (`test_app.py`) antes de liberar o push.
+
+### Prática
+
+Dentro de `modulo8-hooks/` (app.py, test_app.py), implementados e testados os 3 hooks. Todos bloquearam corretamente nos casos esperados (print staged, mensagem sem prefixo, teste falho) e liberaram nos casos válidos.
+
+### Bug encontrado e corrigido
+
+A primeira versão do pre-commit usava `git diff --cached` só pra **listar** os arquivos staged, mas o `grep` de `print(` rodava no arquivo do **disco**, não no conteúdo staged (index). Resultado: editar o arquivo no disco sem re-dar `git add` bastava pra passar no hook, mesmo com o `print()` ainda staged — confirmado na prática com `git show`, que mostrou o print entrando no histórico apesar do hook ter "bloqueado" a tentativa anterior.
+
+Corrigido trocando o grep no disco por `git show ":$arquivo" | grep -n "print("`, que lê o conteúdo real do index. Testado de novo reproduzindo o mesmo cenário: dessa vez bloqueou corretamente.
+
+### Versionamento via core.hooksPath
+
+Hooks copiados pra `.githooks/` (versionada) e ativados com `git config core.hooksPath .githooks`.
+
+**Atenção:** `core.hooksPath` é uma config local (fica em `.git/config`, não versionado). Quem clonar o repo do zero precisa rodar `git config core.hooksPath .githooks` manualmente — os hooks não ativam sozinhos só por estarem na pasta.
+
