@@ -3,7 +3,7 @@ def soma(a, b, c=0):
 
 def subtrai(a, b):
 
-    return a - b 
+        return a - b 
 
 print("resultado da soma:", soma(1, 2))
 
