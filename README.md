@@ -315,3 +315,40 @@ Praticado no próprio repo git-avancado (histórico mais rico que o sistema-banc
 - `-M` — detecta linhas movidas (exige conteúdo byte-idêntico; cut/paste funciona, retype não)
 - `-C` — detecta linhas copiadas de outro arquivo (tem limiar mínimo de 40 caracteres; níveis mais altos buscam em todo o histórico, com risco de falso positivo)
 - `--reverse` — rastreia a última revisão onde uma linha existiu, útil pra achar quando algo foi removido
+
+
+## Módulo 12 — Workflows e branching strategies
+
+### Teoria
+Comparação entre três estratégias de branching: **Gitflow** (branches
+main/develop/feature/release/hotfix, pensado pra releases versionadas),
+**GitHub Flow** (só main + feature branches, integração via PR, deploy
+imediato) e **Trunk-based development** (commits diretos ou branches
+de vida curtíssima direto em main/trunk, com feature flags escondendo
+código incompleto).
+
+### Prática
+Simulei os três workflows na subpasta `modulo12-workflows`:
+
+- **Gitflow completo**: `feature/boas-vindas` → `develop` → `release/1.0`
+(tag v1.0) → `main` → `hotfix/corrige-bug` (tag v1.0.1) → `develop`.
+Total: 3 branches temporárias, 4 merge commits, 2 tags.
+- **GitHub Flow**: `feature/despedida-formal` criada direto de `main`,
+merge --no-ff direto de volta pra `main`. Sem `develop`, sem `release`.
+Total: 1 branch, 1 merge commit.
+- **Trunk-based**: commit direto em `main` (`log_acao` atrás de uma
+feature flag `FEATURE_LOG_ATIVO`). Zero branches, zero merges.
+
+### Descoberta prática
+O hook `commit-msg` do Módulo 8 bloqueia até merge commits automáticos
+(mensagem padrão "Merge branch..." não bate com nenhum prefixo aceito),
+já que o hook não tem exceção pra esse tipo de commit — diferente do
+comportamento comum em hooks reais. Resolvido usando `--no-verify`
+nos merges.
+
+### Conclusão
+Fica visível na prática o trade-off de overhead: Gitflow garante
+organização forte pra releases versionadas, mas custa 3x mais branches
+e merges que GitHub Flow pra entregar a mesma mudança; trunk-based
+elimina esse custo por completo, mas exige testes/CI muito mais
+maduros e feature flags pra não quebrar produção.
