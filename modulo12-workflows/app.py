@@ -11,3 +11,9 @@ def boas_vindas(nome):
 
 def despedida_formal(nome):
     return f"Atenciosamente, ate breve, {nome}."
+
+FEATURE_LOG_ATIVO = False
+
+def log_acao(acao):
+    if FEATURE_LOG_ATIVO:
+        print(f"[LOG] {acao}")
