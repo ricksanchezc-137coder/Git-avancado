@@ -8,3 +8,6 @@ def despedida(nome):
 def boas_vindas(nome):
     """funcao corrigida"""
     return f"Bem-vindo(a), {nome}!"
+
+def despedida_formal(nome):
+    return f"Atenciosamente, ate breve, {nome}."
