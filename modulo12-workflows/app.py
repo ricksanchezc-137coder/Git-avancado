@@ -1,4 +1,5 @@
 def saudacao(nome):
+    """diz ola para usuario = nome """
     return f"Ola, {nome}!"
 
 def despedida(nome):
