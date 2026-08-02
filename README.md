@@ -294,3 +294,24 @@ Subtree — praticado em modulo10-submodules-subtrees/katas-subtree:
 
 Conclusão prática: subtree evita as duas maiores dores do submodule no dia a dia (init/update manual e pointer desatualizado), ao custo de reconstruir histórico compartilhado nas trocas (pull/push mais lentos) e do repo pai crescer com o conteúdo externo embutido.
 
+## Módulo 11 — Log/blame avançado
+
+Praticado no próprio repo git-avancado (histórico mais rico que o sistema-bancario, com branches e merges reais).
+
+**Filtros de log:**
+- `--graph --oneline --all --decorate` — visualização de branches/merges
+- `--author="nome"` combinado com filtro de path (`-- pasta/`)
+- `--grep` (múltiplos = OR por padrão; `--all-match` = AND)
+- `--since`/`--until` com data absoluta
+
+**Pickaxe:**
+- `-S"string"` — commits onde a contagem de ocorrências mudou
+- `-G"regex"` — commits onde uma linha casando com o regex mudou (mesmo sem alterar contagem)
+- Testado com 3 commits propositais numa função `soma`, provando a diferença na prática
+
+**Blame avançado:**
+- `-L linha,linha` — limita a um intervalo
+- `-w` — ignora diferença de espaço em branco
+- `-M` — detecta linhas movidas (exige conteúdo byte-idêntico; cut/paste funciona, retype não)
+- `-C` — detecta linhas copiadas de outro arquivo (tem limiar mínimo de 40 caracteres; níveis mais altos buscam em todo o histórico, com risco de falso positivo)
+- `--reverse` — rastreia a última revisão onde uma linha existiu, útil pra achar quando algo foi removido
