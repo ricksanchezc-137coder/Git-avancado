@@ -352,3 +352,25 @@ organização forte pra releases versionadas, mas custa 3x mais branches
 e merges que GitHub Flow pra entregar a mesma mudança; trunk-based
 elimina esse custo por completo, mas exige testes/CI muito mais
 maduros e feature flags pra não quebrar produção.
+
+##Módulo 13 — Config avançado e aliases personalizados
+
+
+O Git resolve suas configurações em três camadas hierárquicas: system (/etc/gitconfig, escopo de máquina, ausente por padrão no Termux por não haver separação entre admin e usuário), global (~/.gitconfig, escopo de usuário) e local (.git/config, escopo de repositório). A resolução segue precedência estrita local > global > system: quando a mesma chave existe em mais de uma camada, o Git usa a versão mais específica e ignora as demais, sem mesclar valores. A introspecção dessa hierarquia é feita com git config --list --show-origin, que lista todas as chaves ativas anotando o arquivo de origem de cada uma, e git config --list --local --show-origin, que restringe a listagem à camada local. Nesse módulo isso foi validado sobrescrevendo user.email no escopo local de um repositório e confirmando com git config user.email (resolução efetiva) versus git config --global user.email (valor global, que permanece intocado); a reversão foi feita com git config --unset.
+
+
+
+Aliases são atalhos armazenados na seção [alias] do arquivo de configuração e existem em três níveis de sofisticação crescente. Aliases simples (git config --global alias.co checkout) apenas substituem texto após git , sem interpretação de shell. Aliases prefixados com ! são delegados inteiramente ao interpretador de shell em vez de serem tratados como subcomando do Git, o que permite compor flags e encadear lógica arbitrária — mas isso introduz uma armadilha de shell: no bash, ! seguido de caractere alfanumérico aciona expansão de histórico (history expansion) mesmo dentro de aspas duplas, já que aspas duplas preservam a maioria das expansões do shell e não bloqueiam essa em particular. O resultado é que git config --global alias.lg "!git log --oneline --graph --all --decorate" foi aceito sem erro de sintaxe, mas gravou um valor corrompido/incompleto na seção [alias] — confirmado via inspeção direta com cat ~/.gitconfig, que mostrou a ausência da entrada esperada. A correção exigiu aspas simples, que suprimem toda expansão do shell: git config --global alias.lg '!git log --oneline --graph --all --decorate'. A mesma causa raiz se repetiu no alias last.
+
+
+
+O terceiro nível — aliases que aceitam argumentos posicionais — requer a definição de uma função de shell nomeada inline, invocada ao final da string: !f() { git checkout -b "$1"; }; f. A primeira tentativa (!f() {git checkout -b "$1"; }; f) falhou com “syntax error: ‘}’ unexpected”, porque { e } em contexto de bloco de comando do shell são palavras reservadas (reserved words), não pontuação, e precisam estar delimitadas por espaço em ambos os lados para serem tokenizadas corretamente; colado ao git seguinte, o { foi absorvido como parte de um token só e o parser nunca reconheceu a abertura de bloco. Corrigido inserindo o espaço, o alias new passou a criar e trocar de branch corretamente a partir de um argumento (git new branch-test), testado e depois desfeito com git branch -d.
+
+
+
+Por fim, includeIf permite inclusão condicional de um arquivo de configuração adicional baseada no diretório de trabalho, útil para separar identidade/config entre contextos (ex: pessoal vs. profissional) sem sobrescrita manual por repositório. A sintaxe registrada via git config --global includeIf.gitdir:<caminho>/.path <arquivo> aponta para um arquivo de config alternativo que só é mesclado quando o .git do repositório atual está sob o caminho especificado. Isso foi validado criando ~/.gitconfig-teste com um user.email alternativo via git config -f ~/.gitconfig-teste user.email <valor>, registrando a condição para o diretório do repositório em uso, e confirmando a resolução efetiva de dentro do repositório (valor alternativo) e de fora dele (valor global original inalterado) — demonstrando que a condição de gitdir é avaliada dinamicamente por diretório corrente, não fixada no momento da configuração. Removido ao final com --unset do includeIf e exclusão do arquivo auxiliar.
+
+
+
+Configuração final de aliases persistida no ~/.gitconfig: st (status), co (checkout), br (branch), lg (!git log --oneline --graph --all --decorate), last (!git log -1 HEAD --stat) e new (!f() { git checkout -b "$1"; }; f).
+
