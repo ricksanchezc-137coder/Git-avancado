@@ -1,5 +1,6 @@
 def bem_vindo(nome):
-    return f"Bem-vindo {nome}"
+    return f"Ola, {nome}"
 
 def adeus(nome):
-    return f"Adeus {nome}"
+    return f"Ate mais {nome}"
+
