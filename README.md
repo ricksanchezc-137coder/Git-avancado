@@ -374,3 +374,21 @@ Por fim, includeIf permite inclusão condicional de um arquivo de configuração
 
 Configuração final de aliases persistida no ~/.gitconfig: st (status), co (checkout), br (branch), lg (!git log --oneline --graph --all --decorate), last (!git log -1 HEAD --stat) e new (!f() { git checkout -b "$1"; }; f).
 
+## Módulo 14 — Colaboração avançada
+
+**Teoria**
+- Pull Request (PR): pedido formal de merge entre branches no GitHub. Mostra diff, permite comentários e review, roda CI antes do merge — não existe como comando git puro, é recurso da plataforma.
+- Code review: aprovação (Approve), rejeição (Request changes) ou comentário no PR. O autor da PR nunca pode aprovar a própria PR.
+- Protected branches: regras numa branch (ex: main) — bloqueiam push direto, exigem PR + aprovação, podem exigir CI passando. O dono/admin do repo tem bypass automático dessas regras por padrão, a menos que "Do not allow bypassing the above settings" esteja marcado.
+- Squash and merge: colapsa todos os commits da branch em um único commit linear na branch de destino.
+- Create a merge commit: preserva os commits individuais da branch e cria um commit de merge com dois pais.
+- Rebase and merge: reaplica os commits da branch um a um sobre o destino, sem commit de merge, mantendo granularidade.
+
+**Prática**
+- Branch `modulo14-colaboracao` criada com 3 commits (`d971bb7`, `989e0f6`, `c995b2d`); PR #1 aberta contra a main.
+- Protected branch rule criada na main: "Require a pull request before merging" + "Require approvals" (1).
+- Testado bypass de admin: com a regra ativa mas sem "Do not allow bypassing", apareceu checkbox "Merge without waiting for requirements to be met (bypass rules)" — dono do repo consegue ignorar a exigência de review. Ativando "Do not allow bypassing", a checkbox some e o merge trava por completo, até pra o owner.
+- PR #1 mergeada com **squash and merge** → main recebeu um único commit (`bb0f1eb`), histórico linear, sem rastro dos 3 commits originais no `git log` local.
+- Branch `modulo14-merge-commit` criada com 2 commits (`d1346de`, `70a9d03`); PR #2 aberta e mergeada com **Create a merge commit** → gerou commit de merge real (`0a8e5c5`) com duas linhas de pai, preservando os commits individuais.
+- Comparação confirmada com `git log --graph --oneline`: squash aparece reto na linha principal, merge commit aparece com ramificação (`|\`) antes de convergir.
+
