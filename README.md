@@ -392,3 +392,31 @@ Configuração final de aliases persistida no ~/.gitconfig: st (status), co (che
 - Branch `modulo14-merge-commit` criada com 2 commits (`d1346de`, `70a9d03`); PR #2 aberta e mergeada com **Create a merge commit** → gerou commit de merge real (`0a8e5c5`) com duas linhas de pai, preservando os commits individuais.
 - Comparação confirmada com `git log --graph --oneline`: squash aparece reto na linha principal, merge commit aparece com ramificação (`|\`) antes de convergir.
 
+
+
+## Módulo 15 — Encerramento
+
+Revisão de log/blame avançado aplicada direto no sistema-bancario
+(projeto real, fora do repo de prática), fechando o Currículo 11.
+
+### O que foi feito
+- `git log --graph --oneline --all --decorate` + `git shortlog -sn`:
+histórico 100% linear (sem merges), 9 commits ao todo.
+- Achado: o fechamento do Currículo 10 (TDD) teve na verdade 3 commits
+(dois refactors — extract tentar_login e extract submenu_extratos,
+feitos pra reduzir complexidade medida pelo radon — antes do commit
+final), quebrando o padrão "um commit por currículo" registrado até
+então.
+- `git log -L :funcname:file` (tentar_login, submenu_extratos): mostrou
+só o commit de criação, sem histórico anterior. Confirma que -L por
+nome de função não faz detecção de move — só rastreia a partir de
+onde a assinatura da função passa a existir.
+- `git blame -C -C -C10 -L 99,113 main.py`: a maior parte das linhas
+ficou atribuída ao próprio commit de extração (50610c0). Só 2 linhas
+(except ValueError / print de erro) apontaram pra um commit bem mais
+antigo. Comparando o diff completo, essas 2 linhas foram as únicas
+que permaneceram idênticas — o resto do bloco mudou de comportamento
+na extração (break virou return, bloco except Exception novo).
+Conclusão: -C detecta cópia/move por similaridade textual real, não
+por intenção — refactor funcional junto com a extração quebra a
+detecção, mesmo no nível máximo de configuração.
